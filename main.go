@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rdawson46/got/utils"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/rdawson46/got/ui"
 )
 
 func main() {
@@ -15,8 +16,7 @@ func main() {
         name = os.Args[1]
     }
 
-    fmt.Println("Name: %s", name)
-
+    /*
     gitter, err := utils.NewGit(name)
 
     if err != nil {
@@ -25,4 +25,12 @@ func main() {
     }
 
     fmt.Println(gitter.Entries)
+    */
+
+    p := tea.NewProgram(ui.InitializeModel(), tea.WithAltScreen())
+
+    if _, err := p.Run(); err != nil {
+        fmt.Println("Broke:", err)
+        os.Exit(1)
+    }
 }
