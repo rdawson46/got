@@ -12,11 +12,18 @@ type Gitter struct {
 }
 
 func (l *Gitter) IsGit() bool {
+    for _, entry := range l.Entries {
+        if entry.IsDir() {
+            if entry.Name() == ".git" {
+                return true
+            }
+        }
+    }
+
     return false
 }
 
 func NewGit(dir string) (*Gitter, error) {
-    // open parent dir
     b, err := IsDir(dir)
 
     if err != nil {
