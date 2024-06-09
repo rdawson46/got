@@ -63,14 +63,14 @@ func InitializeModel() Model {
     name, err := utils.ToAbs(name)
 
     if err != nil {
-        fmt.Println("Broke when converting")
+        fmt.Println("Broke when converting to absolute path")
         os.Exit(1)
     }
 
     gitter, err := utils.NewGit(name)
 
     if err != nil {
-        fmt.Println("gitter broke")
+        fmt.Println("Gitter broke")
         os.Exit(1)
     }
 
