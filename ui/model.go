@@ -5,6 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/rdawson46/got/ui/fileModel"
 	"github.com/rdawson46/got/ui/gitModel"
 	"github.com/rdawson46/got/utils"
@@ -14,23 +15,25 @@ type Model struct {
     width  int
     height int
     dir    string
-    gitter *utils.Gitter
     gitM   gitModel.GitModel
     fileM  fileModel.FileModel
 }
 
 func (m Model) View() string {
-    s := fmt.Sprintf("Parent: %s\n", m.gitter.ParentDir)
+    s := ""
 
-    for _, entry := range m.gitter.Entries {
-        s = fmt.Sprintf("%s%s\n", s, entry.Name())
-    }
-
-    s = fmt.Sprintf("%s\nIs Git Dir: %t\n", s, m.gitter.IsGit())
     s = fmt.Sprintf("%s\nHeight: %d\n", s, m.height)
     s = fmt.Sprintf("%s\nWidth: %d\n", s, m.width)
 
-    return s
+    joiner := lipgloss.JoinHorizontal(
+        lipgloss.Center,
+        m.fileM.View(),
+        m.gitM.View(),
+    )
+
+    s = fmt.Sprintf("%s\n%s", s, joiner)
+
+    return joiner
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -67,16 +70,17 @@ func InitializeModel() Model {
         os.Exit(1)
     }
 
-    gitter, err := utils.NewGit(name)
+
+    fileM, err := fileModel.InitialFileModel(name)
 
     if err != nil {
-        fmt.Println("Gitter broke")
+        fmt.Println("Error with initial file model")
         os.Exit(1)
     }
 
     return Model{
-        gitter: gitter,
         dir: name,
+        fileM: fileM,
     }
 }
 
