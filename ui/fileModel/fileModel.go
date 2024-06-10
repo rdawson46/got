@@ -60,8 +60,16 @@ func (f FileModel) View() string {
 
     s := title.Render(f.path)
 
-    for _, entry := range f.Entires {
-        s = fmt.Sprintf("%s\n%s", s, entry.Name())
+    for i, entry := range f.Entires {
+        name := entry.Name()
+
+        if i == f.current {
+            highlight := lipgloss.NewStyle().Foreground(lipgloss.Color("#cc0088"))
+
+            name = highlight.Render(name)
+        }
+
+        s = fmt.Sprintf("%s\n%s", s, name)
     }
 
     wrap := lipgloss.NewStyle().
@@ -72,5 +80,17 @@ func (f FileModel) View() string {
 }
 
 func (f FileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    switch msg := msg.(type) {
+    case tea.KeyMsg:
+        switch msg.String() {
+        case "j":
+            f.current++
+        case "k":
+            if f.current > 0 {
+                f.current--
+            }
+        }
+    }
+
     return f, nil
 }

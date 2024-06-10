@@ -11,9 +11,17 @@ import (
 	"github.com/rdawson46/got/utils"
 )
 
+type focus int
+
+const (
+    fileTee focus = iota
+    gitMenu
+)
+
 type Model struct {
     width  int
     height int
+    focus  focus
     dir    string
     gitM   gitModel.GitModel
     fileM  fileModel.FileModel
@@ -42,6 +50,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         switch msg.String() {
         case "q", "ctrl+c":
             return m, tea.Quit
+        case "tab":
+            // move focus
+            m.focus = (m.focus + 1) % 2
+        default:
+            switch m.focus {
+            case fileTee:
+                // NOTE: ignoring cmd for now
+                f, _ := m.fileM.Update(msg)
+                m.fileM = f.(fileModel.FileModel)
+            case gitMenu:
+                g, _ := m.gitM.Update(msg)
+                m.gitM = g.(gitModel.GitModel)
+            }
         }
     case tea.WindowSizeMsg:
         m.height = msg.Height

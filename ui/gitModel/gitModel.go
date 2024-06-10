@@ -3,6 +3,7 @@ package gitModel
 import (
     tea "github.com/charmbracelet/bubbletea"
     "github.com/go-git/go-git/v5"
+    "github.com/charmbracelet/lipgloss"
 )
 
 type GitModel struct {
@@ -20,8 +21,12 @@ func (g GitModel) Init() tea.Cmd {
 }
 
 func (g GitModel) View() string {
-    
-    return "git model view"
+    wrap := lipgloss.NewStyle().
+        Border(lipgloss.RoundedBorder(), true, true, true, true).
+        BorderForeground(lipgloss.Color("#474747"))
+
+
+    return wrap.Render("git model view")
 }
 
 func (g GitModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
