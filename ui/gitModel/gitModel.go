@@ -44,9 +44,9 @@ func (g GitModel) View() string {
         wrap = wrap.BorderForeground(lipgloss.Color("#00dd00"))
     }
 
-    s := fmt.Sprintf("%+v\n\n%+v", *g.repo, g.repo.Storer)
+    // s := fmt.Sprintf("%+v\n\n%+v", *g.repo, g.repo.Storer)
 
-    return wrap.Render(s)
+    return wrap.Render(g.status())
 }
 
 func (g GitModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
