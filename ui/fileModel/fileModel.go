@@ -12,9 +12,11 @@ import (
 
 // model to represent file tree
 type FileModel struct {
-    path    string
-    Entires []fs.DirEntry
-    current int
+    path          string
+    Entires       []fs.DirEntry
+    current       int
+    Active        bool
+    Height, Width int
 }
 
 // TODO: better error handling
@@ -48,6 +50,7 @@ func InitialFileModel(name string) (FileModel, error) {
         path: path,
         Entires: entries,
         current: 0,
+        Active: true,
     }, nil
 }
 
@@ -74,7 +77,13 @@ func (f FileModel) View() string {
 
     wrap := lipgloss.NewStyle().
         Border(lipgloss.RoundedBorder(), true, true, true, true).
-        BorderForeground(lipgloss.Color("#474747"))
+        BorderForeground(lipgloss.Color("#474747")).
+        Width(f.Width).
+        Height(f.Height)
+
+    if f.Active {
+        wrap = wrap.BorderForeground(lipgloss.Color("#00dd00"))
+    }
 
     return wrap.Render(s)
 }
@@ -84,11 +93,9 @@ func (f FileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case tea.KeyMsg:
         switch msg.String() {
         case "j":
-            f.current++
+            f.current = min(f.current + 1, len(f.Entires) - 1)
         case "k":
-            if f.current > 0 {
-                f.current--
-            }
+            f.current = max(f.current - 1, 0)
         }
     }
 

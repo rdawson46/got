@@ -16,11 +16,11 @@ type focus int
 const (
     fileTee focus = iota
     gitMenu
+    help
 )
 
 type Model struct {
-    width  int
-    height int
+    width, height  int
     focus  focus
     dir    string
     gitM   gitModel.GitModel
@@ -53,6 +53,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         case "tab":
             // move focus
             m.focus = (m.focus + 1) % 2
+            switch m.focus {
+                case fileTee:
+                    m.fileM.Active = true
+                    m.gitM.Active = false
+                case gitMenu:
+                    m.gitM.Active = true
+                    m.fileM.Active = false
+            }
         default:
             switch m.focus {
             case fileTee:
@@ -65,8 +73,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             }
         }
     case tea.WindowSizeMsg:
+        // height should be same
         m.height = msg.Height
+        m.gitM.Height = msg.Height - 5
+        m.fileM.Height = msg.Height - 5
+
+        // first try 50/50 split
         m.width = msg.Width
+        m.fileM.Width = msg.Width / 4
+        m.gitM.Width = msg.Width / 2
+
         return m, nil
     }
     return m, nil
@@ -91,7 +107,6 @@ func InitializeModel() Model {
         os.Exit(1)
     }
 
-
     fileM, err := fileModel.InitialFileModel(name)
 
     if err != nil {
@@ -99,9 +114,18 @@ func InitializeModel() Model {
         os.Exit(1)
     }
 
+    gitM, err := gitModel.InitialGitModel(name)
+
+    if err != nil {
+        fmt.Println("Error with initial file model")
+        os.Exit(1)
+    }
+
+
     return Model{
         dir: name,
         fileM: fileM,
+        gitM: gitM,
     }
 }
 

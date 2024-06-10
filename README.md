@@ -9,5 +9,6 @@ Git TUI in GO
 * nest models
     * one for a file tree 
     * one for showing git 'status'
+    * create a help menu, opened by ?
 * find/create way to use git
 * create tests
