@@ -1,37 +1,38 @@
 package gitModel
 
 import (
-	"os"
-    "fmt"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	"fmt"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
+var highlight = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
 
-func (g GitModel) status() string {
-    ref, err := g.repo.Head()
-
+func (g GitModel) status() (string, error) {
+    tree, err := g.repo.Worktree()
+    
     if err != nil {
-        os.Exit(1)
+        fmt.Println("No work tree")
+        return "", err
     }
 
-    commit, err := g.repo.CommitObject(ref.Hash())
+    status, err := tree.Status()
 
     if err != nil {
-        os.Exit(1)
-    }
-
-    tree, err := commit.Tree()
-
-    if err != nil {
-        os.Exit(1)
+        fmt.Println("status broke")
+        return "", err
     }
 
     s := ""
 
-    tree.Files().ForEach(func(f *object.File) error {
-        s = fmt.Sprintf("%sblob %s    %s\n", s, f.Hash, f.Name)
-        return nil
-    })
+    if len(status) == 0 {
+        s = "Working branch is up to date"
+    } else{
+        for k, v := range status {
+            sign := highlight.Render(string(v.Worktree))
+            s = fmt.Sprintf("%s%s %s\n", s, k, sign)
+        }
+    }
 
-    return s
+    return s, nil
 }

@@ -2,6 +2,7 @@ package gitModel
 
 import (
 	"fmt"
+    "os"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -46,7 +47,13 @@ func (g GitModel) View() string {
 
     // s := fmt.Sprintf("%+v\n\n%+v", *g.repo, g.repo.Storer)
 
-    return wrap.Render(g.status())
+    s, err := g.status()
+
+    if err != nil {
+        os.Exit(1)
+    }
+
+    return wrap.Render(s)
 }
 
 func (g GitModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
